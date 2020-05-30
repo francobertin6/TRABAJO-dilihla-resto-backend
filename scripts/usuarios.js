@@ -53,7 +53,7 @@ usuarios.post('/usuarios', async (req,res) => {
    if(!req.body.username || !req.body.fullname || !req.body.email || !req.body.tel || !req.body.adress || !req.body.password){
        res.status(500).send('te faltan parametros');
    }
-   else if(req.body.tel !== Number){
+   else if(req.body.tel === isNaN){
        res.status(401).send("solo numeros deben ser aceptados en este campo");
    }
    let check = await checked(req.body.username, req.body.email)
@@ -94,8 +94,52 @@ usuarios.post('/login', async (req,res) => {
             res.status(200).send("tokenusuario: "+signuser);
         }
     });
-    
- 
+
+
+    /*autenticacion token de admin*/
+    const  autadmin = async (req,res,next) =>{
+        let token =  req.headers.authorization;
+        try {
+            decode = jwt.verify(token, firma);
+            if(decode){
+                req.usuario = decode
+                next();
+            }else{
+                throw "Sin permiso";
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(401).json({msj: 'Login inválido'})
+        }
+    };
+    /*borra usuarios, solo si sos admin, FUNCIONA*/ 
+    usuarios.delete('/delete', autadmin, async(req,res) =>{
+        let id = req.body.id;
+        if(!req.body.id){
+            res.status(404).send('no se ha seleccionado el usuario a borrar');
+        } 
+        else if (id.length !== 1){
+            for (let index = 0; index < id.length; index++) {
+                await Sequelize.query('DELETE FROM usuarios WHERE id = ?',
+                {replacements:[id[index]]})
+                .then(function(res){
+                    console.log(res);
+                })
+                console.log( id[index] + ' se ha eliminado' )
+                
+            }
+            res.status(201).send('los usuarios se han eliminado');
+        }
+        else if(id.length == 1){
+            await Sequelize.query('DELETE FROM usuarios WHERE id = ?',
+            {replacements:[id]})
+            .then(function(res){
+                console.log(res);
+            })
+            console.log('el usuario '+ id + ' se ha eliminado');
+            res.status(201).send('el usuario se ha eliminado');
+        }
+    })
 
 
 module.exports = usuarios;
