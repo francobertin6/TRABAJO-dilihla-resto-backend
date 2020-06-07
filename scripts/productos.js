@@ -86,7 +86,7 @@ productos.get('/get/:id', async(req,res)=>{
         res.status(404).send("tu producto no se ha encontrado");
     }else{
         console.log(datos);
-        res.status(401).send("producto encontrado");
+        res.status(201).send("producto encontrado");
     }
 })
 

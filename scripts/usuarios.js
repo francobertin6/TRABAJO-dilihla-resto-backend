@@ -51,7 +51,7 @@ async function checked(username,email){
 /*con este se registran usuarios, FUNCIONA*/
 usuarios.post('/usuarios', async (req,res) => {
    if(!req.body.username || !req.body.fullname || !req.body.email || !req.body.tel || !req.body.adress || !req.body.password){
-       res.status(500).send('te faltan parametros');
+       res.status(400).send('te faltan parametros');
    }
    else if(req.body.tel === isNaN){
        res.status(401).send("solo numeros deben ser aceptados en este campo");

@@ -78,6 +78,24 @@ pedidos.put('/update',autadmin, async (req,res)=>{
 });
 
 
+pedidos.get('/get', autadmin, async(req,res) =>{
+    let datos = await Sequelize.query('SELECT * FROM pedidos',
+    {type: Sequelize.QueryTypes.SELECT})
+    .then(function(res) {
+        return res
+    })
+    console.log(datos);
+    res.status(201).send('los pedidos se han devuelto: ' + datos);
+})
+
+pedidos.delete('/delete', autadmin, async(req,res)=>{
+    let datos = await Sequelize.query('DELETE FROM pedidos WHERE id = ?',
+    {replacements:[req.query.id]});
+    let datos1 = await Sequelize.query('DELETE FROM productosxpedidos WHERE id_pedido = ?',
+    {replacements:[req.query.id]});
+    res.status(201).send('el pedido fue eliminado')
+    
+})
 
 
 
