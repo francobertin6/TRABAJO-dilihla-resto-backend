@@ -7,9 +7,9 @@ const firma = "delilahresto";
 const jwt = require('jsonwebtoken');
 productos.use(bodyparser.json());
 
-async function createproducts(foodname,price,url){  
-    let datos = await Sequelize.query('INSERT INTO productos(foodname, price, url) VALUES (?, ?, ?)',
-    {replacements:[foodname,price,url]})
+async function createproducts(foodname,price,url,categoria){  
+    let datos = await Sequelize.query('INSERT INTO productos(foodname, price, url, categoria) VALUES (?, ?, ?, ?)',
+    {replacements:[foodname,price,url,categoria]})
     .then(function(res) {
         return res;
     });
@@ -33,22 +33,20 @@ const  autadmin = async (req,res,next) =>{
 };
 /*creo productos, FUNCIONA*/
 productos.post('/post',autadmin, async(req,res)=>{
-    if(!req.body.foodname || !req.body.price || !req.body.url){
+    if(!req.body.foodname || !req.body.price || !req.body.url || !req.body.categoria){
         res.status(404).send("no se cumplen todos los parametros")
     }else{
-    await createproducts(req.body.foodname, req.body.price, req.body.url);
+    await createproducts(req.body.foodname, req.body.price, req.body.url, req.body.categoria);
     res.status(201).send('tu producto fue agregado');
     }
 });
 
 
 /*modifico productos, FUNCIONA*/ 
-productos.put('/put/:id/:value',autadmin, async(req,res)=>{
-    const values = req.params.value 
+productos.put('/put/:id',autadmin, async(req,res)=>{
     const id = req.params.id;
-    const {value} = req.query
-    await Sequelize.query('UPDATE productos SET '+ values+' = ? WHERE id = '+ id ,
-        {replacements:[req.query.value]})
+    await Sequelize.query('UPDATE productos SET '+ Object.keys(req.query) +' = ? WHERE id = '+ id ,
+        {replacements:[req.query.foodname]})
         .then(function(res){
             return res
         }); 
@@ -73,7 +71,7 @@ productos.get('/get', async(req,res)=>{
     if(datos[0] == undefined){
     res.status(401).send("no hay productos");
     }else{
-        res.status(201).send("productos devueltos satisfactoriamente");
+        res.status(201).send({datos});
         console.log(datos);
     }
 })
@@ -86,7 +84,7 @@ productos.get('/get/:id', async(req,res)=>{
         res.status(404).send("tu producto no se ha encontrado");
     }else{
         console.log(datos);
-        res.status(201).send("producto encontrado");
+        res.status(201).send({datos});
     }
 })
 

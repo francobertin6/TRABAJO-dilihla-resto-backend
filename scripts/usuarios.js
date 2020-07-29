@@ -79,7 +79,10 @@ usuarios.post('/login', async (req,res) => {
             "usertype" : datos[0].usertype
         }
         let sign = jwt.sign(admintoken,firma);
-        res.status(201).send("tokenadmin: "+sign);
+        res.status(201).send({
+            "usuario": "admin",
+            "token": sign
+        });
         }else if(datos[0].usertype === "user"){
             let usertoken ={
                 "id": datos[0].id,
@@ -91,7 +94,10 @@ usuarios.post('/login', async (req,res) => {
                 "usertype": datos[0].usertype
             }
             let signuser = jwt.sign(usertoken,firma);
-            res.status(200).send("tokenusuario: "+signuser);
+            res.status(200).send({
+                "usuario": "usuario",
+                "token": signuser
+            });
         }
     });
 
