@@ -45,8 +45,10 @@ productos.post('/post',autadmin, async(req,res)=>{
 /*modifico productos, FUNCIONA*/ 
 productos.put('/put/:id',autadmin, async(req,res)=>{
     const id = req.params.id;
+    let valor = JSON.stringify(Object.keys(req.query));
+    console.log(Object.values(req.query))
     await Sequelize.query('UPDATE productos SET '+ Object.keys(req.query) +' = ? WHERE id = '+ id ,
-        {replacements:[req.query.foodname]})
+        {replacements:[Object.values(req.query)]})
         .then(function(res){
             return res
         }); 
